@@ -18,7 +18,7 @@ Script: `docs/spikes/scripts/guardian_probe__startup.lua` (copy it to `<resource
 
 Provide a ReaPack-installed script action, **"Enable band guardian"**, run once at install time. It:
 
-1. Creates `Scripts/__startup.lua` if missing, or if it exists, **adds a clearly marked block** (`-- BEGIN muuri ... -- END muuri`) and leaves the user's own content untouched.
+1. Creates `Scripts/__startup.lua` if missing, or if it exists, **adds a clearly marked block** (`-- BEGIN bandcollab ... -- END bandcollab`) and leaves the user's own content untouched.
 2. The block only loads the guardian from the ReaPack install path, so updates through ReaPack take effect without rewriting the startup file.
 3. Has a matching "Disable band guardian" action that removes only its own block.
 

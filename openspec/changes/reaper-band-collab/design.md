@@ -29,7 +29,7 @@ Lua ships inside REAPER (no interpreter to install), behaves identically on Wind
 *Alternatives:* C++ REAPER extension (per-platform builds and signing, much heavier); Python ReaScript (requires a Python install on every member machine); a standalone app (cannot see or safely modify project state).
 
 ### D2. Band structure lives in a template, identity is by track GUID
-The project template contains one **folder track per member/role**, carrying hidden markers (role id, owner slot) stored in track extended state. `band.json` maps members to roles and holds language, labels and locations. A new song created from the template inherits the structure. Track and folder **names are display labels only**.
+The project template contains one **folder track per member/role**, carrying hidden markers (role id, owner slot) stored in track extended state. `band.json` maps members to roles and holds language, labels and locations. **Nothing in the extension is specific to one band**: the code uses the neutral namespace `bandcollab`, and band, member, song and folder names exist only in `band.json`, the template and the band folder (example names appear in documentation and tests only). A new song created from the template inherits the structure. Track and folder **names are display labels only**.
 *Alternatives:* naming conventions (people rename and mistype), color coding (too easy to change), a global config listing track names (drifts from the projects).
 
 ### D3. "Everything inside your folder is yours" is the ownership rule

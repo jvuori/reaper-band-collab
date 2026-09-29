@@ -1,5 +1,5 @@
 local t = require("luatest")
-local slug = require("muuri.slug")
+local slug = require("bandcollab.slug")
 
 t.test("Finnish letters become plain ASCII", function()
   t.eq(slug.slug("Yö: kuka? Minä"), "yo-kuka-mina")

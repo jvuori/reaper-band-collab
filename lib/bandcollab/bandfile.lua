@@ -1,5 +1,5 @@
 -- band.json: band-level settings shared by everyone through the band folder.
-local json = require("muuri.json")
+local json = require("bandcollab.json")
 
 local M = {}
 

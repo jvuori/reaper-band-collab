@@ -1,5 +1,5 @@
 local t = require("luatest")
-local hash = require("muuri.hash")
+local hash = require("bandcollab.hash")
 local memfs = require("memfs")
 
 t.test("known answers stay stable (changing them breaks existing manifests)", function()

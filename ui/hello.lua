@@ -9,11 +9,11 @@ local function w(...) log[#log + 1] = string.format(...) end
 if not reaper.APIExists("ImGui_CreateContext") then
   w("ReaImGui NOT available")
 else
-  local ctx = reaper.ImGui_CreateContext("Muuri hello")
+  local ctx = reaper.ImGui_CreateContext("Band Collab hello")
   local frames, visible_frames = 0, 0
   local function loop()
     reaper.ImGui_SetNextWindowSize(ctx, 320, 120, reaper.ImGui_Cond_FirstUseEver())
-    local visible, open = reaper.ImGui_Begin(ctx, "Muuri", true)
+    local visible, open = reaper.ImGui_Begin(ctx, "Band Collab", true)
     frames = frames + 1
     if visible then
       visible_frames = visible_frames + 1

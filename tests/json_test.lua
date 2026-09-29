@@ -1,5 +1,5 @@
 local t = require("luatest")
-local json = require("muuri.json")
+local json = require("bandcollab.json")
 
 t.test("encodes scalars and nesting deterministically (sorted keys)", function()
   t.eq(json.encode({ b = 1, a = { 1, 2, { x = true } }, c = "z" }), '{"a":[1,2,{"x":true}],"b":1,"c":"z"}')

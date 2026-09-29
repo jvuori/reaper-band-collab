@@ -2,8 +2,8 @@
 -- A pack directory holds its files, a manifest.json listing each one with size and hash, and a
 -- `valmis` marker that is written LAST. A consumer that finds no marker, or a marker that does
 -- not match, or files that differ from the manifest, must refuse the pack.
-local json = require("muuri.json")
-local hash = require("muuri.hash")
+local json = require("bandcollab.json")
+local hash = require("bandcollab.hash")
 
 local M = {}
 

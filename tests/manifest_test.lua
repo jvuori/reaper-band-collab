@@ -1,6 +1,6 @@
 local t = require("luatest")
-local manifest = require("muuri.manifest")
-local json = require("muuri.json")
+local manifest = require("bandcollab.manifest")
+local json = require("bandcollab.json")
 local memfs = require("memfs")
 
 local function pack()

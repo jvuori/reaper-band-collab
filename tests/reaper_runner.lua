@@ -1,8 +1,8 @@
 -- Runs the *_test.lua files inside REAPER's own Lua, so REAPER-specific code paths are tested.
--- Env: MUURI_ROOT (repo root), TEST_OUT (result file). Optional TEST_FILES (space separated
+-- Env: BANDCOLLAB_ROOT (repo root), TEST_OUT (result file). Optional TEST_FILES (space separated
 -- file names inside tests/). REAPER quits when the run is finished.
 --   reaper -cfgfile <profile>/reaper.ini -nosplash -newinst tests/reaper_runner.lua
-local root = assert(os.getenv("MUURI_ROOT"), "MUURI_ROOT not set")
+local root = assert(os.getenv("BANDCOLLAB_ROOT"), "BANDCOLLAB_ROOT not set")
 local out_path = assert(os.getenv("TEST_OUT"), "TEST_OUT not set")
 _G.TEST_ROOT = root
 package.path = table.concat({ root .. "/?.lua", root .. "/lib/?.lua", root .. "/tests/?.lua", package.path }, ";")

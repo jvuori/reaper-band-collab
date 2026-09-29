@@ -1,6 +1,6 @@
 local t = require("luatest")
-local bandfile = require("muuri.bandfile")
-local json = require("muuri.json")
+local bandfile = require("bandcollab.bandfile")
+local json = require("bandcollab.json")
 local memfs = require("memfs")
 
 local function band()

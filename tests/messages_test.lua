@@ -1,7 +1,7 @@
 local t = require("luatest")
-local strings = require("muuri.strings")
-local messages = require("muuri.messages")
-local manifest = require("muuri.manifest")
+local strings = require("bandcollab.strings")
+local messages = require("bandcollab.messages")
+local manifest = require("bandcollab.manifest")
 
 local s = strings.load(TEST_ROOT .. "/strings", { "en", "fi" }, loadfile, "en")
 

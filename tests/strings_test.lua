@@ -1,5 +1,5 @@
 local t = require("luatest")
-local strings = require("muuri.strings")
+local strings = require("bandcollab.strings")
 
 local tables = {
   en = { hello = "Hello {name}", nested = { deep = "Deep" }, only_en = "English only" },

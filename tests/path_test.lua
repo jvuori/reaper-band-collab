@@ -1,5 +1,5 @@
 local t = require("luatest")
-local path = require("muuri.path")
+local path = require("bandcollab.path")
 
 t.test("join uses exactly one separator, for both styles", function()
   t.eq(path.join("/", "a", "b", "c"), "a/b/c")

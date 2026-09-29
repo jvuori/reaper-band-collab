@@ -3,7 +3,7 @@
 -- so they survive restarts. Nothing here is synced or shared.
 local M = {}
 
-M.SECTION = "muuri_band"
+M.SECTION = "bandcollab"
 
 local Settings = {}
 Settings.__index = Settings

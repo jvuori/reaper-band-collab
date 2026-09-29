@@ -50,3 +50,14 @@ The system SHALL allow a member to be assigned multiple role folders in one song
 #### Scenario: Drummer who also plays keys
 - **WHEN** a member is assigned both the drums and keys roles
 - **THEN** their workspace contains both folders as editable and a proposal covers both
+
+### Requirement: No band-specific content is built in
+The extension SHALL NOT contain any built-in band, member or song names, folder names, or branding. All band-specific text and structure SHALL come from `band.json`, the band template, and the band folder. Example names MAY appear in documentation and tests only.
+
+#### Scenario: A different band installs the extension
+- **WHEN** a band other than the original one installs the extension and runs the setup wizard
+- **THEN** no UI text, folder name, file name or stored key refers to the original band
+
+#### Scenario: Extension code is scanned
+- **WHEN** the code, string tables and UI scripts are searched for the original band's name
+- **THEN** no occurrence is found

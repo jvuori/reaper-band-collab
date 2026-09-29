@@ -10,7 +10,7 @@ Scripts: `ui/hello.lua` (the hello-world window; `HELLO_OUT=<file>` makes it log
 |---|---|
 | Does ReaImGui open a window from a plain script? | **Yes.** ReaImGui 0.10.0.5 placed in `UserPlugins`; the window was visible for all 120 test frames. (ReaImGui itself was copied from its GitHub release here; installing it through the ReaPack UI on Windows is part of the install-guide work in 12.4.) |
 | Can ReaPack install our script from an index, unattended? | **Yes.** ReaPack 1.2.6 with a local index (`file://.../index.xml`): `ReaPack_AddSetRepository(name, url, true, 1)` followed by the action `_REAPACK_SYNC` installed the package in about 2 seconds. |
-| Where does ReaPack put it? | `Scripts/<index name>/<category>/<file>`, for example `Scripts/Muuri Test/Band/muuri_hello.lua`. It cannot write to the `Scripts` root, which confirms the startup-hook decision in `startup-hook.md` (a script writes the marked block into `Scripts/__startup.lua`). |
+| Where does ReaPack put it? | `Scripts/<index name>/<category>/<file>`, for example `Scripts/Example Index/Band/hello.lua`. It cannot write to the `Scripts` root, which confirms the startup-hook decision in `startup-hook.md` (a script writes the marked block into `Scripts/__startup.lua`). |
 | Does the installed copy run? | **Yes.** The ReaPack-installed script opened the same window (120 of 120 frames visible). |
 | Local test index | A `file://` URL works as a repository, so a real index can be tested offline before publishing. |
 

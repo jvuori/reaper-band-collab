@@ -1,4 +1,4 @@
--- In-memory file system with the same interface as lib/muuri/fs_std.lua, for tests.
+-- In-memory file system with the same interface as lib/bandcollab/fs_std.lua, for tests.
 -- Paths use "/" and directories exist implicitly.
 local M = {}
 

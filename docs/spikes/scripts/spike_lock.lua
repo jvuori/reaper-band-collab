@@ -47,9 +47,9 @@ w("B_SHOWINTCP=%s B_SHOWINMIXER=%s I_FOLDERDEPTH=%s I_FOLDERCOMPACT=%s",
 
 -- 5. track ext state round trip (for hidden markers, task 3.1)
 w("== P_EXT ==")
-reaper.GetSetMediaTrackInfo_String(tr, "P_EXT:muuri_role", "bass", true)
-local _, val = reaper.GetSetMediaTrackInfo_String(tr, "P_EXT:muuri_role", "", false)
-w("P_EXT:muuri_role -> %s", tostring(val))
+reaper.GetSetMediaTrackInfo_String(tr, "P_EXT:bandcollab_role", "bass", true)
+local _, val = reaper.GetSetMediaTrackInfo_String(tr, "P_EXT:bandcollab_role", "", false)
+w("P_EXT:bandcollab_role -> %s", tostring(val))
 
 w("== API presence ==")
 for _, n in ipairs({"ImGui_CreateContext", "ReaPack_GetRepositoryInfo", "SNM_GetIntConfigVar", "JS_Dialog_BrowseForFolder"}) do

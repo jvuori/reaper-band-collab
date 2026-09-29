@@ -1,5 +1,5 @@
 local t = require("luatest")
-local localsettings = require("muuri.localsettings")
+local localsettings = require("bandcollab.localsettings")
 
 t.test("starts unconfigured and remembers member and band folder", function()
   local s = localsettings.new(localsettings.memory_backend())

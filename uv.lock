@@ -51,7 +51,7 @@ wheels = [
 ]
 
 [[package]]
-name = "muuri-reaper"
+name = "reaper-band-collab"
 version = "0.1.0"
 source = { virtual = "." }
 

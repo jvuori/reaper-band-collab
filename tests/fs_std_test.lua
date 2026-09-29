@@ -1,6 +1,6 @@
 local t = require("luatest")
-local fs = require("muuri.fs_std")
-local manifest = require("muuri.manifest")
+local fs = require("bandcollab.fs_std")
+local manifest = require("bandcollab.manifest")
 
 -- Listing needs REAPER's API or io.popen; some embedded Lua builds (like lupa's) disable popen.
 local can_list = (reaper ~= nil) or pcall(io.popen, "true")
