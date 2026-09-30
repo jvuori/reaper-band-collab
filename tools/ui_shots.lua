@@ -11,6 +11,10 @@ local wizard = require("bandcollab.wizard")
 local firstrun = require("bandcollab.firstrun")
 local messages = require("bandcollab.messages")
 local wizard_view = require("wizard_view")
+local receive_view = require("receive_view")
+local receive_session = require("bandcollab.receive_session")
+package.path = root .. "/tests/?.lua;" .. package.path
+local memfs = require("memfs")
 local firstrun_view = require("firstrun_view")
 
 local function S(lang) return strings.load(root .. "/strings", { "en", "fi" }, loadfile, lang) end
@@ -72,6 +76,62 @@ end)
 scenario("firstrun_done_fi", "fi", 520, 360, function(s)
   local ui = { folder = "C:\\Users\\Käyttäjä\\Bändi", choices = firstrun.member_choices(band), selected = "eero", done_name = "Eero" }
   return function(ctx) return firstrun_view.draw(ctx, s, ui) end, s:t("ui.firstrun.title")
+end)
+
+local function wav(n)
+  local body = "WAVE" .. "fmt " .. string.pack("<I4I2I2I4I4I2I2", 16, 1, 1, 48000, 96000, 2, 16) .. "data" .. string.pack("<I4", n) .. ("\1"):rep(n)
+  return "RIFF" .. string.pack("<I4", #body) .. body
+end
+local function stage(fs, d, name, size)
+  fs.files[d .. "/" .. name .. ".rpp"] = "<REAPER_PROJECT 0.1 \"7.0\" 0\n  <ITEM\n    <SOURCE WAVE\n      FILE \"media/" .. name .. ".wav\"\n    >\n  >\n>\n"
+  fs.files[d .. "/media/" .. name .. ".wav"] = wav(size or 300)
+end
+local function receive_band(lang)
+  local b = {}
+  for k, v in pairs(band) do b[k] = v end
+  b.language = lang
+  b.libraries = { { id = "harjoitukset", label = lang == "fi" and "Harjoitukset" or "Rehearsals", kind = "dated" },
+                  { id = "levytys", label = lang == "fi" and "Levytys" or "Official", kind = "flat" } }
+  return b
+end
+local function drive(sess) local n = 0; while not sess:step() and n < 10000 do n = n + 1 end end
+
+local function receive_session_ready(lang)
+  local s = S(lang)
+  local fs = memfs.new()
+  stage(fs, "/stage/ilta/a", "Ensimmäinen", 500); stage(fs, "/stage/ilta/b", "Toinen biisi", 4000); stage(fs, "/stage/c", "Kolmas", 500)
+  fs.files["/stage/ilta/b/media/Toinen biisi.wav"] = fs.files["/stage/ilta/b/media/Toinen biisi.wav"]:sub(1, 900)
+  local b = receive_band(lang)
+  local sess = receive_session.new(fs, b, "/band", s, "aino")
+  sess:scan("/stage")
+  sess.library, sess.cycle = "harjoitukset", "2026-09-29"
+  return sess, s, fs
+end
+
+scenario("receive_ready_fi", "fi", 760, 330, function(s)
+  local sess = receive_session_ready("fi")
+  local ui = { staging = "/home/user/rehearsal-copy", scanned = true }
+  return function(ctx) return receive_view.draw(ctx, sess, ui) end, s:t("ui.receive.title")
+end)
+scenario("receive_done_fi", "fi", 760, 470, function(s)
+  local sess = receive_session_ready("fi")
+  sess:start(); drive(sess)
+  local ui = { staging = "/home/user/rehearsal-copy", scanned = true }
+  sess:refresh("/stage")
+  return function(ctx) return receive_view.draw(ctx, sess, ui) end, s:t("ui.receive.title")
+end)
+scenario("receive_copy_en", "en", 760, 330, function(s)
+  local sess, _, fs = receive_session_ready("en")
+  sess:start(); drive(sess)
+  local first = sess.results[1].entry
+  local to_copy = {}
+  for path, data in pairs(fs.files) do
+    if path:sub(1, #("/band/" .. first.path) + 1) == "/band/" .. first.path .. "/" then to_copy[#to_copy + 1] = { path, data } end
+  end
+  for _, f in ipairs(to_copy) do fs.files["/copyhere/x" .. f[1]:sub(#("/band/" .. first.path) + 1)] = f[2] end
+  sess:scan("/copyhere")
+  local ui = { staging = "/copyhere", scanned = true }
+  return function(ctx) return receive_view.draw(ctx, sess, ui) end, s:t("ui.receive.title")
 end)
 
 local errors = {}

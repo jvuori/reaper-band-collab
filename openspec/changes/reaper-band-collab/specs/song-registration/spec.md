@@ -44,6 +44,24 @@ The system SHALL detect a project whose ID is already registered at a different 
 - **WHEN** a project's ID is registered and its old location no longer exists
 - **THEN** the tool treats it as moved and updates the registry without asking
 
+### Requirement: Receiving the same rehearsal twice
+The system SHALL recognize a project whose exact content was already received and SHALL NOT register it again.
+
+#### Scenario: Second receive of the same folder
+- **WHEN** the producer receives a folder whose projects were all received before
+- **THEN** every project is reported as already received and the registry is unchanged
+
+#### Scenario: Project changed since
+- **WHEN** a project's content differs from the one received earlier
+- **THEN** it is treated as a new project
+
+### Requirement: Declined copy
+If the producer says that an arriving project that looks like a copy is not to be received as a copy, the system SHALL leave it out and change nothing.
+
+#### Scenario: Producer skips a suspected copy
+- **WHEN** the producer chooses to skip a project flagged as a possible copy
+- **THEN** it is not received and the registered song is unchanged
+
 ### Requirement: Libraries and cycles
 The system SHALL support multiple libraries (for example rehearsals and official recordings) with identical structure. Within the rehearsal library it SHALL group songs into dated cycles.
 
@@ -57,6 +75,24 @@ The system SHALL let the producer close a cycle. A closed cycle SHALL refuse new
 #### Scenario: Proposal to a closed cycle
 - **WHEN** a member tries to send a proposal for a song in a closed cycle
 - **THEN** the tool refuses and explains that the cycle is closed
+
+### Requirement: A closed cycle takes no new songs
+The system SHALL refuse to receive songs into a closed cycle. The closed state SHALL be visible to members through the publications area, without access to the producer's area.
+
+#### Scenario: Receiving into a closed cycle
+- **WHEN** the producer tries to receive a song into a closed cycle
+- **THEN** it is refused, the message names the cycle, and nothing is written
+
+#### Scenario: A member checks the cycle
+- **WHEN** a member's machine can see only the publications area
+- **THEN** it still shows the cycle as closed
+
+### Requirement: Only complete songs are received, and the registry is written last
+The system SHALL register a song only after its files, identity and manifest are in place, so an interrupted receive never leaves a registered song without its files.
+
+#### Scenario: Copy fails midway
+- **WHEN** copying a song fails, for example because the disk is full
+- **THEN** no registry entry is created for it and the message says what failed
 
 ### Requirement: Safe folder and file naming
 The system SHALL create only names that are valid on Windows and Linux: lowercase ASCII, unique case-insensitively, not Windows-reserved, and free of forbidden characters. The human-readable song name SHALL be stored separately.

@@ -36,6 +36,21 @@ function M.new(files)
     }
   end
 
+  function fs.open_write(path)
+    local parts = {}
+    fs.files[path] = ""
+    return {
+      write = function(_, data) parts[#parts + 1] = data; fs.files[path] = table.concat(parts) end,
+      close = function() end,
+    }
+  end
+
+  function fs.read_range(path, offset, n)
+    local d = fs.files[path]
+    if d == nil then return nil, path .. ": no such file" end
+    return d:sub(offset + 1, offset + n)
+  end
+
   function fs.list(dir)
     local prefix = dir:gsub("/+$", "") .. "/"
     local seen, out = {}, {}

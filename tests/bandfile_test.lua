@@ -89,3 +89,18 @@ t.test("one member can own several roles, and owners can be looked up", function
   t.eq(roles[2].id, "keys")
   t.eq(#bandfile.roles_of(b, "nobody"), 0)
 end)
+
+t.test("libraries are optional, defaulted, and validated when present", function()
+  local b = band()
+  t.eq(#bandfile.libraries(b), 2)
+  t.eq(bandfile.library(b, "rehearsals").kind, "dated")
+  t.eq(bandfile.library(b, "official").kind, "flat")
+  t.eq(bandfile.library(b, "nope"), nil)
+  b.libraries = { { id = "sessions", label = "Sessions", kind = "dated" } }
+  t.truthy(bandfile.validate(b))
+  t.eq(#bandfile.libraries(b), 1)
+  invalid(function(x) x.libraries = {} end, "libraries")
+  invalid(function(x) x.libraries = { { id = "a", label = "A", kind = "weekly" } } end, "libraries[1]")
+  invalid(function(x) x.libraries = { { id = "a", label = "", kind = "flat" } } end, "libraries[1]")
+  invalid(function(x) x.libraries = { { id = "a", label = "A", kind = "flat" }, { id = "a", label = "B", kind = "flat" } } end, "duplicate library")
+end)

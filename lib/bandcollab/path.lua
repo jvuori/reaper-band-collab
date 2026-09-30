@@ -45,4 +45,15 @@ end
 -- too_long(path [, limit]) -> true when the path would exceed the Windows path limit.
 function M.too_long(path, limit) return #path >= (limit or M.WINDOWS_LIMIT) end
 
+-- same(a, b [, sep]) -> true when two paths name the same place: separators, repeated
+-- separators and a trailing separator are ignored, and case is ignored on Windows.
+function M.same(a, b, sep)
+  local function key(x)
+    x = x:gsub("[/\\]+", "/"):gsub("/$", "")
+    if (sep or M.native_sep()) == "\\" then x = x:lower() end
+    return x
+  end
+  return key(a) == key(b)
+end
+
 return M

@@ -30,13 +30,13 @@
 
 ## 4. Song registration (spec: song-registration)
 
-- [ ] 4.1 Implement scanning a staging folder for project files and listing them as songs, and verify with a folder of arbitrary names and three projects
-- [ ] 4.2 Implement receipt verification (referenced media present and non-empty, manifest check when present) and verify with a truncated media file and a missing file
-- [ ] 4.3 Implement the song ID registry and first-arrival registration and verify a moved project registers silently
-- [ ] 4.4 Implement copy detection with the "Onko tämä kopio?" prompt and fresh ID assignment noting the origin, and verify by copying a registered project into another library
-- [ ] 4.5 Implement libraries and dated cycles and verify a rehearsal with several songs is grouped under its date
-- [ ] 4.6 Implement closing a cycle and verify a proposal to a closed cycle is refused with an explanation
-- [ ] 4.7 Implement the "Ota harjoitus vastaan" panel and verify an end-to-end receive of a real SCP-copied rehearsal folder (including an interrupted-copy case)
+- [x] 4.1 Implement scanning a staging folder for project files and listing them as songs, and verify with a folder of arbitrary names and three projects
+- [x] 4.2 Implement receipt verification (referenced media present and non-empty, manifest check when present) and verify with a truncated media file and a missing file
+- [x] 4.3 Implement the song ID registry and first-arrival registration and verify a moved project registers silently
+- [x] 4.4 Implement copy detection with the "Onko tämä kopio?" prompt and fresh ID assignment noting the origin, and verify by copying a registered project into another library
+- [x] 4.5 Implement libraries and dated cycles and verify a rehearsal with several songs is grouped under its date
+- [x] 4.6 Implement closing a cycle and verify a proposal to a closed cycle is refused with an explanation
+- [x] 4.7 Implement the "Ota harjoitus vastaan" panel and verify an end-to-end receive of a real SCP-copied rehearsal folder (including an interrupted-copy case)
 
 ## 5. Master publishing (spec: master-publishing)
 

@@ -6,6 +6,14 @@ local M = {}
 M.SCHEMA = 1
 M.FILENAME = "band.json"
 
+-- A library is a root for songs. "dated" libraries group songs into dated cycles (rehearsals);
+-- "flat" libraries hold songs directly (official recordings).
+M.LIBRARY_KINDS = { dated = true, flat = true }
+M.DEFAULT_LIBRARIES = {
+  { id = "rehearsals", label = "rehearsals", kind = "dated" },
+  { id = "official", label = "official", kind = "flat" },
+}
+
 -- Errors are returned as (nil, code, detail). Codes have matching err.band_* messages in strings/.
 --   band_unreadable, band_invalid, band_too_new
 
@@ -52,6 +60,18 @@ function M.validate(band)
     return fail("band_invalid", "producer")
   end
 
+  if band.libraries ~= nil then
+    if type(band.libraries) ~= "table" or #band.libraries == 0 then return fail("band_invalid", "libraries") end
+    local lib_ids = {}
+    for i, l in ipairs(band.libraries) do
+      if type(l) ~= "table" or not nonempty_string(l.id) or not nonempty_string(l.label) or not M.LIBRARY_KINDS[l.kind] then
+        return fail("band_invalid", "libraries[" .. i .. "]")
+      end
+      if lib_ids[l.id] then return fail("band_invalid", "duplicate library " .. l.id) end
+      lib_ids[l.id] = true
+    end
+  end
+
   local loc = band.locations
   if type(loc) ~= "table" then return fail("band_invalid", "locations") end
   for _, key in ipairs({ "master", "publications", "proposals" }) do
@@ -81,6 +101,14 @@ function M.write(fs, dir, band)
   local written, err = fs.write_all(dir .. "/" .. M.FILENAME, json.encode(band, { pretty = true }) .. "\n")
   if not written then return fail("band_unreadable", err) end
   return true
+end
+
+-- libraries(band) -> list of { id, label, kind }; the defaults when band.json lists none.
+function M.libraries(band) return band.libraries or M.DEFAULT_LIBRARIES end
+
+-- library(band, id) -> library table | nil
+function M.library(band, id)
+  for _, l in ipairs(M.libraries(band)) do if l.id == id then return l end end
 end
 
 -- owner_of(band, role_id) -> member table | nil

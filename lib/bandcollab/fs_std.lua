@@ -3,6 +3,8 @@
 --   fs.exists(path) -> bool             fs.size(path) -> integer | nil
 --   fs.open_read(path) -> handle | nil, err   (handle:read(n), handle:close())
 --   fs.read_all(path) -> string | nil, err    fs.write_all(path, data) -> true | nil, err
+--   fs.open_write(path) -> handle | nil, err  (handle:write(data), handle:close())
+--   fs.read_range(path, offset, n) -> string | nil, err
 --   fs.list(dir) -> { {name=, is_dir=}, ... } | nil    fs.mkdirs(path) -> bool
 --   fs.remove(path) -> bool             fs.rename(from, to) -> bool
 local M = {}
@@ -25,6 +27,23 @@ function M.open_read(path)
   local f, err = io.open(path, "rb")
   if not f then return nil, err end
   return f
+end
+
+-- open_write(path) -> handle | nil, err   (handle:write(data), handle:close()); creates or truncates.
+function M.open_write(path)
+  local f, err = io.open(path, "wb")
+  if not f then return nil, err end
+  return f
+end
+
+-- read_range(path, offset, n) -> string | nil, err   (offset is 0-based; may return fewer bytes at the end)
+function M.read_range(path, offset, n)
+  local f, err = io.open(path, "rb")
+  if not f then return nil, err end
+  f:seek("set", offset)
+  local s = f:read(n) or ""
+  f:close()
+  return s
 end
 
 function M.read_all(path)
