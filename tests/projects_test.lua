@@ -108,3 +108,38 @@ t.test("a missing template gives an error, not a crash or a stray folder", funct
   t.falsy(fs.exists(dir .. "/songs"))
   os.execute("rm -rf '" .. dir .. "'")
 end)
+
+t.test("a new song is bound to its own file, so saving it can never overwrite the band template", function()
+  need_reaper()
+  local fs, projects = require("bandcollab.fs_std"), require("bandcollab.projects")
+  local publisher = require("bandcollab.publisher")
+  local dir = tmpdir()
+  t.truthy(projects.create_template(fs, band, nil, dir .. "/template.rpp"))
+  local template_before = fs.read_all(dir .. "/template.rpp")
+
+  local file = projects.create_song(fs, dir .. "/template.rpp", dir .. "/songs", "Kappale", { keep_open = true })
+  local proj = (reaper.EnumProjects(-1))
+  t.eq(publisher.project_file(proj), file, "the song tab must be bound to the song's file, not the template")
+  t.eq(reaper.IsProjectDirty(proj), 0, "a freshly created song must not be marked as changed")
+
+  -- work in the song and save it, as a producer would
+  reaper.GetSetMediaTrackInfo_String(reaper.GetTrack(proj, 0), "P_NAME", "changed in the song", true)
+  reaper.SelectProjectInstance(proj)
+  reaper.Main_OnCommand(40026, 0)
+  t.eq(fs.read_all(dir .. "/template.rpp"), template_before, "saving the song changed the template")
+  t.truthy(fs.read_all(file):find("changed in the song", 1, true))
+
+  reaper.SelectProjectInstance(proj); reaper.Main_OnCommand(40860, 0)
+  os.execute("rm -rf '" .. dir .. "'")
+end)
+
+t.test("creating a template and a song leaves no unsaved tab that would ask a question when closed", function()
+  need_reaper()
+  local fs, projects = require("bandcollab.fs_std"), require("bandcollab.projects")
+  local dir = tmpdir()
+  local tabs = tab_count()
+  t.truthy(projects.create_template(fs, band, nil, dir .. "/template.rpp"))
+  t.truthy(projects.create_song(fs, dir .. "/template.rpp", dir .. "/songs", "Kappale"))
+  t.eq(tab_count(), tabs)
+  os.execute("rm -rf '" .. dir .. "'")
+end)

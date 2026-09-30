@@ -40,13 +40,13 @@
 
 ## 5. Master publishing (spec: master-publishing)
 
-- [ ] 5.1 Implement revision numbering and immutability and verify a second publish creates r2 and leaves r1 byte-identical
-- [ ] 5.2 Implement stem rendering per role folder outside each recipient's folders per the spike results (docs/spikes/stems.md), and verify a stem matches what the producer hears from that folder, folder bus included and master bus excluded
-- [ ] 5.3 Implement the reference mix render with master-bus processing and verify it plays as the full mix
-- [ ] 5.4 Implement recording the tempo map and length and flagging structural changes between revisions, and verify with a revision that lengthens a section
-- [ ] 5.5 Include each member's own-folder media in the publication and verify a workspace can be built from the publication alone
-- [ ] 5.6 Write the manifest and completion marker last and verify consumers refuse a publication interrupted mid-write
-- [ ] 5.7 Implement the "Julkaise" panel with note entry and verify the note reaches the change log
+- [x] 5.1 Implement revision numbering and immutability and verify a second publish creates r2 and leaves r1 byte-identical
+- [x] 5.2 Implement stem rendering per role folder outside each recipient's folders per the spike results (docs/spikes/stems.md), and verify a stem matches what the producer hears from that folder, folder bus included and master bus excluded
+- [x] 5.3 Implement the reference mix render with master-bus processing and verify it plays as the full mix
+- [x] 5.4 Implement recording the tempo map and length and flagging structural changes between revisions, and verify with a revision that lengthens a section
+- [x] 5.5 Include each member's own-folder media in the publication and verify a workspace can be built from the publication alone
+- [x] 5.6 Write the manifest and completion marker last and verify consumers refuse a publication interrupted mid-write
+- [x] 5.7 Implement the "Julkaise" panel with note entry and verify the note reaches the change log
 
 ## 6. Member workspace (spec: member-workspace)
 
@@ -75,9 +75,9 @@
 
 ## 8. Change log (spec: change-log)
 
-- [ ] 8.1 Implement the log writer (single writer, newest first, date and time, event, actor, note, generated facts) and verify golden-file tests for publication and import entries
-- [ ] 8.2 Implement the `HUOM` line rules and verify present for a structural change and absent for an ordinary one
-- [ ] 8.3 Implement "Tehtävää" requests addressed to members and verify rendering under its own heading
+- [x] 8.1 Implement the log writer (single writer, newest first, date and time, event, actor, note, generated facts) and verify golden-file tests for publication and import entries
+- [x] 8.2 Implement the `HUOM` line rules and verify present for a structural change and absent for an ordinary one
+- [x] 8.3 Implement "Tehtävää" requests addressed to members and verify rendering under its own heading
 - [ ] 8.4 Implement the summary-plus-body note model and producer editing of the note at import, and verify the edited text is logged
 - [ ] 8.5 Implement showing entries newer than the member's base revision in the panel and verify with a member on r6 and master r8
 

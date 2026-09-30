@@ -7,6 +7,19 @@ local out_path = assert(os.getenv("TEST_OUT"), "TEST_OUT not set")
 _G.TEST_ROOT = root
 package.path = table.concat({ root .. "/?.lua", root .. "/lib/?.lua", root .. "/tests/?.lua", package.path }, ";")
 
+-- Quits REAPER without ever waiting for a person: an open project with unsaved changes would make
+-- the normal quit action ask "save changes?" in a modal dialog, so in that case exit directly.
+local function safe_quit()
+  local i = 0
+  while true do
+    local p = reaper.EnumProjects(i, "")
+    if not p then break end
+    if reaper.IsProjectDirty(p) ~= 0 then os.exit(0, true) end
+    i = i + 1
+  end
+  reaper.Main_OnCommand(40004, 0)
+end
+
 local luatest = require("luatest")
 local lines, total_failed = {}, 0
 
@@ -48,4 +61,4 @@ lines[#lines + 1] = total_failed == 0 and "RESULT: ok" or ("RESULT: " .. total_f
 local f = io.open(out_path, "w")
 f:write(table.concat(lines, "\n"), "\n")
 f:close()
-reaper.Main_OnCommand(40004, 0)
+safe_quit()

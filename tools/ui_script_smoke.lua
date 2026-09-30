@@ -2,6 +2,19 @@
 -- A failure inside the script's defer loop would normally open a blocking dialog; here the
 -- loop is wrapped so errors are recorded instead.
 -- Env: BANDCOLLAB_ROOT, SMOKE_SCRIPT (path), SMOKE_OUT (result file), SMOKE_FRAMES (default 60)
+-- Quits REAPER without ever waiting for a person: an open project with unsaved changes would make
+-- the normal quit action ask "save changes?" in a modal dialog, so in that case exit directly.
+local function safe_quit()
+  local i = 0
+  while true do
+    local p = reaper.EnumProjects(i, "")
+    if not p then break end
+    if reaper.IsProjectDirty(p) ~= 0 then os.exit(0, true) end
+    i = i + 1
+  end
+  reaper.Main_OnCommand(40004, 0)
+end
+
 local script = assert(os.getenv("SMOKE_SCRIPT"), "SMOKE_SCRIPT not set")
 local out_path = assert(os.getenv("SMOKE_OUT"), "SMOKE_OUT not set")
 local frames_wanted = tonumber(os.getenv("SMOKE_FRAMES") or "60")
@@ -15,7 +28,7 @@ local function report()
   f:write(string.format("script=%s\nframes=%d\nerrors=%d\n", script, frames, #errors))
   for _, e in ipairs(errors) do f:write(e, "\n") end
   f:close()
-  reaper.Main_OnCommand(40004, 0)
+  safe_quit()
 end
 
 local ok, err = pcall(dofile, script)

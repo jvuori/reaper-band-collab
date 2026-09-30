@@ -2,6 +2,19 @@
 -- It doubles as a smoke test: every frame is drawn under pcall, and errors are recorded.
 -- Env: BANDCOLLAB_ROOT (repository root), SHOT_DIR (working directory for signal files).
 -- Signal files: ready_<name> (contains the window title) -> the shell captures -> ack_<name>.
+-- Quits REAPER without ever waiting for a person: an open project with unsaved changes would make
+-- the normal quit action ask "save changes?" in a modal dialog, so in that case exit directly.
+local function safe_quit()
+  local i = 0
+  while true do
+    local p = reaper.EnumProjects(i, "")
+    if not p then break end
+    if reaper.IsProjectDirty(p) ~= 0 then os.exit(0, true) end
+    i = i + 1
+  end
+  reaper.Main_OnCommand(40004, 0)
+end
+
 local root = assert(os.getenv("BANDCOLLAB_ROOT"), "BANDCOLLAB_ROOT not set")
 local dir = assert(os.getenv("SHOT_DIR"), "SHOT_DIR not set")
 package.path = table.concat({ root .. "/lib/?.lua", root .. "/ui/?.lua", package.path }, ";")
@@ -12,6 +25,10 @@ local firstrun = require("bandcollab.firstrun")
 local messages = require("bandcollab.messages")
 local wizard_view = require("wizard_view")
 local receive_view = require("receive_view")
+local publish_view = require("publish_view")
+local publish_session = require("bandcollab.publish_session")
+local songfile = require("bandcollab.songfile")
+local manifest = require("bandcollab.manifest")
 local receive_session = require("bandcollab.receive_session")
 package.path = root .. "/tests/?.lua;" .. package.path
 local memfs = require("memfs")
@@ -134,6 +151,46 @@ scenario("receive_copy_en", "en", 760, 330, function(s)
   return function(ctx) return receive_view.draw(ctx, sess, ui) end, s:t("ui.receive.title")
 end)
 
+-- publish panel: a fake REAPER environment (one open project, saved or not, a publisher that succeeds)
+local function publish_world(lang, opts)
+  opts = opts or {}
+  local s = S(lang)
+  local fs = memfs.new()
+  local dir = "/band/tuottaja/harjoitukset/2026-09-29/biisi"
+  songfile.write(fs, dir, { id = "s0123456789abcdef", title = lang == "fi" and "Yö kuka minä" or "Night song", slug = "biisi", library = "harjoitukset", cycle = "2026-09-29" })
+  local pub = "/band/julkaisut/harjoitukset/2026-09-29/biisi"
+  for _, n in ipairs({ 1, 2 }) do
+    fs.files[pub .. "/r" .. n .. "/a.wav"] = "x"
+    manifest.write(fs, pub .. "/r" .. n, manifest.build(fs, pub .. "/r" .. n, { created = "T" }))
+  end
+  local env = { project = function() return "PROJ" end, file = function() return dir .. "/biisi.rpp" end, dirty = function() return opts.dirty end }
+  env.publish = function(_, _, _, _, _, o)
+    o.step("stem: bass")
+    return { revision = 3, structure = { changed = true, reasons = { "length" } } }
+  end
+  local b = receive_band(lang)
+  local sess = publish_session.new(fs, b, "/band", s, "aino", env)
+  sess:refresh()
+  return sess, s
+end
+
+scenario("publish_ready_fi", "fi", 680, 520, function(_)
+  local sess, s = publish_world("fi")
+  sess.note.summary = "Uusi miksaus, basso nostettu"
+  sess.note.body = "Kertosäe pidennettiin neljällä tahdilla."
+  sess:add_task("Rummut", "uusi otto kertosäkeeseen")
+  return function(ctx) return publish_view.draw(ctx, sess, s) end, s:t("ui.publish.title")
+end)
+scenario("publish_done_en", "en", 680, 400, function(_)
+  local sess, s = publish_world("en")
+  sess:start(); local n = 0; while not sess:step() and n < 100 do n = n + 1 end
+  return function(ctx) return publish_view.draw(ctx, sess, s) end, s:t("ui.publish.title")
+end)
+scenario("publish_unsaved_fi", "fi", 680, 160, function(_)
+  local sess, s = publish_world("fi", { dirty = true })
+  return function(ctx) return publish_view.draw(ctx, sess, s) end, s:t("ui.publish.title")
+end)
+
 local errors = {}
 local names = {}
 for _, sc in ipairs(scenarios) do names[#names + 1] = sc.name end
@@ -148,7 +205,7 @@ local function finish()
   out:write(#errors == 0 and "no errors\n" or table.concat(errors, "\n") .. "\n")
   out:close()
   local done = io.open(dir .. "/finished", "w"); done:write("ok\n"); done:close()
-  reaper.Main_OnCommand(40004, 0)
+  safe_quit()
 end
 
 local function start(i)

@@ -1,5 +1,18 @@
 -- Run inside REAPER by tools/scp_e2e.sh: receives a rehearsal that arrived through a real scp.
 -- Env: BANDCOLLAB_ROOT, PHASE (1 = report only, 2 = import what is ready), INCOMING, BAND_FOLDER, OUT
+-- Quits REAPER without ever waiting for a person: an open project with unsaved changes would make
+-- the normal quit action ask "save changes?" in a modal dialog, so in that case exit directly.
+local function safe_quit()
+  local i = 0
+  while true do
+    local p = reaper.EnumProjects(i, "")
+    if not p then break end
+    if reaper.IsProjectDirty(p) ~= 0 then os.exit(0, true) end
+    i = i + 1
+  end
+  reaper.Main_OnCommand(40004, 0)
+end
+
 local root = assert(os.getenv("BANDCOLLAB_ROOT"))
 package.path = table.concat({ root .. "/lib/?.lua", package.path }, ";")
 local fs = require("bandcollab.fs_std")
@@ -33,4 +46,4 @@ for _, c in ipairs(list) do
   end
 end
 local f = io.open(out, "w"); f:write(table.concat(lines, "\n"), "\n"); f:close()
-reaper.Main_OnCommand(40004, 0)
+safe_quit()

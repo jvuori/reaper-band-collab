@@ -36,8 +36,11 @@ end)
 t.test("REAPER backend stores in extended state (needs REAPER)", function()
   if not reaper then t.skip("not running inside REAPER") end
   local s = localsettings.new(localsettings.reaper_backend())
+  local previous = s:member()          -- never destroy a real machine's set-up: put it back afterwards
   s:set_member("testmember")
   t.eq(s:member(), "testmember")
   s:set_member(nil)
   t.eq(s:member(), nil)
+  s:set_member(previous)
+  t.eq(s:member(), previous)
 end)

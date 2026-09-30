@@ -13,6 +13,7 @@ local slug = require("bandcollab.slug")
 local ids = require("bandcollab.ids")
 local bandfile = require("bandcollab.bandfile")
 local path = require("bandcollab.path")
+local rpp = require("bandcollab.rpp")
 
 local M = {}
 
@@ -34,9 +35,9 @@ function M.candidates(ctx, staging, opts)
   opts = opts or {}
   local out = {}
   for _, c in ipairs(inspect.scan(ctx.fs, staging)) do
-    c.title = c.name
-    c.inspection = inspect.inspect(ctx.fs, c.rpp, { check_hash = opts.check_hash })
     local text = ctx.fs.read_all(c.rpp) or ""
+    c.title = rpp.title(text) or c.name -- a title set in the project beats the file name
+    c.inspection = inspect.inspect(ctx.fs, c.rpp, { check_hash = opts.check_hash })
     c.source_hash = hash.string(text)
     c.identity = identity.classify(ctx.fs, ctx.band_folder, ctx.registry, c.dir, c.source_hash)
     if c.identity.state == "moved" then c.title = c.identity.entry.title end -- a moved song keeps its title

@@ -51,7 +51,7 @@ Every publication and proposal contains a manifest listing each file with size a
 
 ### D7. Member workspace is separate from what is delivered
 A member works in `work/` (messy, synced at will, never consumed by anyone). "Ehdota" makes a **frozen, timestamped delivery** in their proposals area after a preflight (media all present and consolidated into the pack, timing matches the base, folder non-empty, no orphans, base revision noted). A newer delivery supersedes older ones; older ones are kept. The producer only ever imports a delivery.
-A member working offline uses identical screens; their "band folder" is a local folder carried on removable media.
+A workspace (like a template or a song) must be built in a project tab that was **opened from the file it will be saved to**: relative media paths only resolve in a project that has a file name, and saving an untitled tab or a tab opened from another file "as" something else leaves it bound to the wrong file (for a song made from the band template, Ctrl+S would overwrite the template). A member working offline uses identical screens; their "band folder" is a local folder carried on removable media.
 
 ### D8. Producer import is preview → explicit accept → backup → undo
 "Ota ehdotus pääversioon" shows what will be replaced (folders, track counts, length, tempo comparison, the member's note, base revision vs. current) and any warnings, then requires confirmation. Before writing, the tool saves a timestamped backup of the master. The tool replaces only the proposer's owned folders, then records the event in the change log. "Kumoa" restores the backup. Only the producer's tool writes the master.
