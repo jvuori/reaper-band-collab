@@ -21,12 +21,12 @@
 
 ## 3. Band definition (spec: band-definition)
 
-- [ ] 3.1 Implement reading and writing hidden role/owner markers on folder tracks and verify markers survive save/reopen and track rename
-- [ ] 3.2 Implement the band setup wizard UI (members, instruments, track counts) and verify it generates a template and `band.json` for a three-member band
-- [ ] 3.3 Implement creating a song project from the band template and verify the folders appear in the agreed order with markers
+- [x] 3.1 Implement reading and writing hidden role/owner markers on folder tracks and verify markers survive save/reopen and track rename
+- [x] 3.2 Implement the band setup wizard UI (members, instruments, track counts) and verify it generates a template and `band.json` for a three-member band
+- [x] 3.3 Implement creating a song project from the band template and verify the folders appear in the agreed order with markers
 - [ ] 3.4 Implement the first-run flow ("Kuka sinä olet?", band folder selection) with rejection of folders without a band marker, and verify manually with a valid and an invalid folder
-- [ ] 3.5 Support one member owning several folders and verify the roster and a workspace reflect it
-- [ ] 3.6 Verify no band-specific names are built in: search `lib/`, `ui/`, `strings/` and `reapack/` for the original band's name and check there are no occurrences, and run the setup wizard for a differently named example band and check no leftover names appear in any UI text, folder, file or stored key
+- [x] 3.5 Support one member owning several folders and verify the roster and a workspace reflect it
+- [x] 3.6 Verify no band-specific names are built in: search `lib/`, `ui/`, `strings/` and `reapack/` for the original band's name and check there are no occurrences, and run the setup wizard for a differently named example band and check no leftover names appear in any UI text, folder, file or stored key
 
 ## 4. Song registration (spec: song-registration)
 

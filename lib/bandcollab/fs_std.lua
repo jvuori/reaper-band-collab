@@ -50,6 +50,10 @@ local function shquote(s) return "'" .. s:gsub("'", "'\\''") .. "'" end
 
 if reaper then
   function M.list(dir)
+    -- REAPER caches directory listings per path; index -1 flushes the cache, so a listing
+    -- always reflects what is on disk now (files and folders created since the last listing).
+    reaper.EnumerateSubdirectories(dir, -1)
+    reaper.EnumerateFiles(dir, -1)
     local out = {}
     local i = 0
     while true do
@@ -64,9 +68,6 @@ if reaper then
       if not name then break end
       out[#out + 1] = { name = name, is_dir = false }
       i = i + 1
-    end
-    if #out == 0 and reaper.EnumerateFiles(dir, 0) == nil and reaper.EnumerateSubdirectories(dir, 0) == nil then
-      -- REAPER returns nothing for an empty or a missing directory; treat both as an empty listing
     end
     table.sort(out, function(a, b) return a.name < b.name end)
     return out

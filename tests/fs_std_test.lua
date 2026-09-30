@@ -56,3 +56,19 @@ t.test("a real pack builds, verifies, and detects real corruption", function()
   t.eq(problems[1].code, "hash_mismatch")
   os.execute("rm -rf '" .. d .. "'")
 end)
+
+t.test("a listing sees folders and files created after an earlier listing of the same folder", function()
+  need_listing()
+  local d = tmpdir()
+  t.eq(#fs.list(d .. "/media"), 0)
+  fs.mkdirs(d .. "/media/one")
+  fs.write_all(d .. "/media/a.wav", "x")
+  local first = {}
+  for _, e in ipairs(fs.list(d .. "/media")) do first[#first + 1] = e.name end
+  t.eq(table.concat(first, ","), "a.wav,one")
+  fs.mkdirs(d .. "/media/two")
+  local second = {}
+  for _, e in ipairs(fs.list(d .. "/media")) do second[#second + 1] = e.name end
+  t.eq(table.concat(second, ","), "a.wav,one,two")
+  os.execute("rm -rf '" .. d .. "'")
+end)
