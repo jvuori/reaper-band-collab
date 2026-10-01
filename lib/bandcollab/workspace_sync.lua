@@ -375,6 +375,7 @@ function M.send(fs, band, band_folder, ws, opts)
   local info = {
     schema = deliveries.SCHEMA, song = state.song, member = state.member, base_revision = state.base_revision,
     created = now.iso, note = opts.note, roles = roles, fingerprint = fingerprint,
+    timing = publisher.capture_timing(proj),
   }
   if not fs.write_all(dir .. "/" .. deliveries.INFO, json.encode(info, { pretty = true }) .. "\n") then
     return nil, "publish_cannot_write", dir

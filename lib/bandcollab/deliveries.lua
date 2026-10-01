@@ -63,4 +63,23 @@ function M.status(fs, publications_song_dir, delivery_id)
   return "pending"
 end
 
+-- record_import(fs, publications_song_dir, item) -> true | nil, err
+-- Adds { delivery =, member =, at =, ... } to imports.json (the producer's record of what was taken in).
+function M.record_import(fs, dir, item)
+  local data = json.try_decode(fs.read_all(dir .. "/" .. M.IMPORTS) or "")
+  if type(data) ~= "table" or type(data.imports) ~= "table" then data = { schema = 1, imports = json.array() } end
+  data.imports[#data.imports + 1] = item
+  return fs.write_all(dir .. "/" .. M.IMPORTS, json.encode(data, { pretty = true }) .. "\n")
+end
+
+-- remove_import(fs, publications_song_dir, delivery_id) -> true | nil, err (used when an import is undone)
+function M.remove_import(fs, dir, delivery_id)
+  local data = json.try_decode(fs.read_all(dir .. "/" .. M.IMPORTS) or "")
+  if type(data) ~= "table" or type(data.imports) ~= "table" then return true end
+  local kept = json.array()
+  for _, item in ipairs(data.imports) do if item.delivery ~= delivery_id then kept[#kept + 1] = item end end
+  data.imports = kept
+  return fs.write_all(dir .. "/" .. M.IMPORTS, json.encode(data, { pretty = true }) .. "\n")
+end
+
 return M

@@ -28,6 +28,8 @@ local receive_view = require("receive_view")
 local publish_view = require("publish_view")
 local sync_view = require("sync_view")
 local picker_view = require("picker_view")
+local import_view = require("import_view")
+local import_session = require("bandcollab.import_session")
 local sync_session = require("bandcollab.sync_session")
 local workspace_picker = require("bandcollab.workspace_picker")
 local wm = require("bandcollab.workspace_model")
@@ -272,6 +274,61 @@ end)
 scenario("picker_empty_en", "en", 620, 220, function(_)
   local sess, s = picker_world("en", false)
   return function(ctx) return picker_view.draw(ctx, sess) end, s:t("ui.picker.title")
+end)
+
+-- the producer's proposals panel: fake operations with canned data
+local function import_world(lang, opts)
+  opts = opts or {}
+  local s = S(lang)
+  local fi = lang == "fi"
+  local entries = {
+    { member = "eero", member_name = "Eero", title = fi and "Yö kuka minä" or "Night song", slug = "biisi", sent = "2026-09-29 20:41", song_id = "s1",
+      delivery = "d1", dir = "/d", pub_dir = "/pub", note = { summary = fi and "Tiukennettu säkeistö 2" or "Tightened verse 2" }, base = 5, current = 8, outdated = true },
+    { member = "pia", member_name = "Pia", title = fi and "Yö kuka minä" or "Night song", slug = "biisi", sent = "2026-09-30 18:05", song_id = "s1",
+      delivery = "d2", dir = "/d2", pub_dir = "/pub", note = { summary = fi and "Uusi laulu kertosäkeeseen" or "New chorus vocal" }, base = 8, current = 8, outdated = false },
+  }
+  local env = { undo_id = opts.undo_id }
+  env.inbox = function() return { pending = opts.empty and {} or entries, accepted = {}, arriving = opts.arriving and { { member = "aino", member_name = "Aino", delivery = "d9" } } or {} } end
+  env.master = function() return { song = { id = "s1" }, file = "/m.rpp", dir = "/m" } end
+  env.can_undo = function() return env.undo_id end
+  env.preview = function(_, _, _, _, entry)
+    return { note = entry.note, base = entry.base, current = entry.current,
+      folders = { { role = "drums", label = fi and "Rummut" or "Drums", before = { tracks = 2, items = 1 }, after = { tracks = 3, items = 4 } },
+                  { role = "bass", label = fi and "Basso" or "Bass", ignored = true } },
+      warnings = opts.warnings and {
+        { code = "import_outdated", severity = "warning", vars = { base = 5, current = 8 } },
+        { code = "import_conflict", severity = "warning", detail = fi and "Rummut" or "Drums" },
+        { code = "import_tempo", severity = "warning" },
+        { code = "import_longer", severity = "info", detail = "3:16 / 3:08" } } or {},
+      timing = { master = { bpm = 120, length = 188 }, proposal = { bpm = opts.warnings and 124 or 120, length = 196 }, tempo_differs = opts.warnings } }
+  end
+  env.import = function() return nil end
+  env.undo = function() return nil end
+  env.publications_dir = function() return "/pub" end
+  local b = receive_band(lang)
+  b.producer = "aino"
+  local sess = import_session.new(memfs.new(), b, "/band", s, "aino", env)
+  sess:refresh()
+  return sess, s, entries
+end
+scenario("import_inbox_fi", "fi", 680, 330, function(_)
+  local sess, s = import_world("fi", { arriving = true })
+  return function(ctx) return import_view.draw(ctx, sess) end, s:t("ui.import.title")
+end)
+scenario("import_review_fi", "fi", 680, 600, function(_)
+  local sess, s, entries = import_world("fi", { warnings = true })
+  sess:review(entries[1])
+  return function(ctx) return import_view.draw(ctx, sess) end, s:t("ui.import.title")
+end)
+scenario("import_review_clean_en", "en", 680, 520, function(_)
+  local sess, s, entries = import_world("en")
+  sess:review(entries[2])
+  return function(ctx) return import_view.draw(ctx, sess) end, s:t("ui.import.title")
+end)
+scenario("import_done_fi", "fi", 680, 330, function(_)
+  local sess, s = import_world("fi", { undo_id = "d1", empty = true })
+  sess.result = { ok = true, text = s:t("ui.import.imported") }
+  return function(ctx) return import_view.draw(ctx, sess) end, s:t("ui.import.title")
 end)
 
 local errors = {}

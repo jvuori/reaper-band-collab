@@ -36,7 +36,8 @@ t.test("a publication has a stem per role folder with folder processing baked in
   -- publication data
   local info = json.decode(fx.fs.read_all(dir .. "/publication.json"))
   t.eq(info.revision, 1); t.eq(info.song.title, "Test Song"); t.eq(info.note.summary, "First mix")
-  t.eq(#info.roles, 2); t.eq(info.roles[1].id, "bass"); t.eq(info.roles[1].owner, "aino"); t.eq(info.roles[2].owner, "eero")
+  t.eq(#info.roles, 2); t.eq(#info.roles[1].fingerprint, 16); t.truthy(info.roles[1].fingerprint ~= info.roles[2].fingerprint)
+  t.eq(info.roles[1].id, "bass"); t.eq(info.roles[1].owner, "aino"); t.eq(info.roles[2].owner, "eero")
   t.falsy(info.structure.changed, "the first revision has nothing to change from")
   local timing = json.decode(fx.fs.read_all(dir .. "/timing.json"))
   t.truthy(math.abs(timing.length - 3) < 0.05)

@@ -4,6 +4,7 @@
 -- information, and the folder's own tracks and media so a member can start a workspace from the
 -- publication alone. The manifest and completion marker are written last.
 local pm = require("bandcollab.projectmodel")
+local wm = require("bandcollab.workspace_model")
 local ownexport = require("bandcollab.ownexport")
 local songfile = require("bandcollab.songfile")
 local cycles = require("bandcollab.cycles")
@@ -157,6 +158,7 @@ function M.publish(fs, band, band_folder, proj, S, opts)
     roles[#roles + 1] = {
       id = f.role, label = role_info and role_info.label or f.role, owner = owner and owner.id or nil,
       stem = "stems/" .. f.role .. ".wav", own = "own/" .. f.role,
+      fingerprint = wm.fingerprint({ pm.folder_chunk(proj, f) }), -- how the folder looked when published (see the import's conflict check)
     }
     step("own: " .. f.role)
     local n, eerr = ownexport.export(fs, proj, f, rev_dir .. "/own/" .. f.role, project_dir, opts.yield)

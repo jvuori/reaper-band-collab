@@ -60,25 +60,25 @@
 - [x] 6.8 Implement the send preflight (media consolidation, timing vs. base, empty folder, orphan tracks) with plain-language fixes and verify each case
 - [x] 6.9 Implement frozen, timestamped deliveries that supersede without removing older ones and verify two sends keep both
 - [x] 6.10 Implement the note field and proposal status line (sent time, pending/accepted) and verify the panel shows both after sending
-- [ ] 6.11 Verify the offline route end to end: send a proposal into a local band folder, copy it on removable media, and import it unchanged
+- [x] 6.11 Verify the offline route end to end: send a proposal into a local band folder, copy it on removable media, and import it unchanged
 
 ## 7. Proposal import (spec: proposal-import)
 
-- [ ] 7.1 Implement the proposals inbox with member, time, note and outdated-base marker and verify with proposals on r5 and r8
-- [ ] 7.2 Implement the import preview (folders, counts, timing comparison, note, base vs. current, warnings) with Accept/Cancel and verify nothing changes on Cancel
-- [ ] 7.3 Implement pre-import integrity verification and verify a delivery lacking its marker is refused
-- [ ] 7.4 Implement timestamped master backup before import and verify the backup exists before any write
-- [ ] 7.5 Implement replacing only the proposer's owned folders and verify unexpected changes elsewhere in a delivery are ignored
-- [ ] 7.6 Implement conflict detection when the producer changed the member's folder after the base and verify the preview warns
-- [ ] 7.7 Implement "Kumoa" restoring the backup and verify the master is identical to its pre-import state
-- [ ] 7.8 Verify import writes the change-log entry with sent and imported times and the note
+- [x] 7.1 Implement the proposals inbox with member, time, note and outdated-base marker and verify with proposals on r5 and r8
+- [x] 7.2 Implement the import preview (folders, counts, timing comparison, note, base vs. current, warnings) with Accept/Cancel and verify nothing changes on Cancel
+- [x] 7.3 Implement pre-import integrity verification and verify a delivery lacking its marker is refused
+- [x] 7.4 Implement timestamped master backup before import and verify the backup exists before any write
+- [x] 7.5 Implement replacing only the proposer's owned folders and verify unexpected changes elsewhere in a delivery are ignored
+- [x] 7.6 Implement conflict detection when the producer changed the member's folder after the base and verify the preview warns
+- [x] 7.7 Implement "Kumoa" restoring the backup and verify the master is identical to its pre-import state
+- [x] 7.8 Verify import writes the change-log entry with sent and imported times and the note
 
 ## 8. Change log (spec: change-log)
 
 - [x] 8.1 Implement the log writer (single writer, newest first, date and time, event, actor, note, generated facts) and verify golden-file tests for publication and import entries
 - [x] 8.2 Implement the `HUOM` line rules and verify present for a structural change and absent for an ordinary one
 - [x] 8.3 Implement "Tehtävää" requests addressed to members and verify rendering under its own heading
-- [ ] 8.4 Implement the summary-plus-body note model and producer editing of the note at import, and verify the edited text is logged
+- [x] 8.4 Implement the summary-plus-body note model and producer editing of the note at import, and verify the edited text is logged
 - [ ] 8.5 Implement showing entries newer than the member's base revision in the panel and verify with a member on r6 and master r8
 
 ## 9. Project guardian (spec: project-guardian)

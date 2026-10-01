@@ -93,6 +93,16 @@ function M.role_of_track(proj, track)
   return M.get_marker(reaper.GetTrack(proj, f.first - 1), M.KEY_ROLE)
 end
 
+-- folder_chunk(proj, folder) -> the state text of a role folder (the folder track and everything in it)
+function M.folder_chunk(proj, folder)
+  local parts = {}
+  for i = folder.index, folder.last do
+    local _, chunk = reaper.GetTrackStateChunk(reaper.GetTrack(proj, i - 1), "", false)
+    parts[#parts + 1] = chunk
+  end
+  return table.concat(parts, "\n")
+end
+
 -- owned_folders(proj, band, member_id) -> role folders whose role belongs to the member.
 -- band.json is authoritative for ownership, not the owner marker stored on the folder.
 function M.owned_folders(proj, band, member_id)

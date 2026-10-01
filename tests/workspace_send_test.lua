@@ -198,6 +198,8 @@ t.test("a delivery is complete and frozen, and carries the note, the base revisi
   t.eq(info.member, "eero"); t.eq(info.base_revision, 1); t.eq(info.song.slug, ws.state.song.slug)
   t.eq(info.note.summary, "Tiukennettu säkeistö 2"); t.eq(info.note.body, "Uudet täytteet kohdassa 1:32.")
   t.eq(#info.roles, 1); t.eq(info.roles[1], "drums")
+  t.truthy(info.timing and info.timing.length > 0, "the delivery must carry its timing, for the producer's preview")
+  t.truthy(info.timing.bpm > 0)
   t.falsy(fx.fs.exists(sent.dir .. "/own/bass"), "his delivery must not carry Aino's stem or folder")
   t.truthy(fx.fs.exists(sent.dir .. "/own/drums/media"))
 

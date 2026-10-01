@@ -71,6 +71,20 @@ t.test("a member with a local band folder can work from copied publications and 
   t.eq(listed.id, sent.id)
   t.eq(deliveries.read(fs, listed.dir).note.summary, "offline take")
 
+  -- 5b. the producer takes the carried delivery into the master, unchanged: his timing comes through
+  local importer, inbox = require("bandcollab.importer"), require("bandcollab.inbox")
+  local strings = require("bandcollab.strings")
+  local S = strings.load(TEST_ROOT .. "/strings", { "en", "fi" }, loadfile, "en")
+  local master = assert(importer.identify_master(fs, fx.proj))
+  local entry = inbox.list(fs, band, producer_folder).pending[1]
+  t.eq(entry.delivery, sent.id, "the carried delivery must show up in the producer's inbox")
+  t.eq(entry.note.summary, "offline take")
+  local imported, icode, idetail = importer.import(fs, band, producer_folder, master, entry, S, { epoch = 2000000, now = NOW })
+  t.truthy(imported, tostring(icode) .. " " .. tostring(idetail))
+  local master_item = reaper.GetTrackMediaItem(reaper.GetTrack(master.proj, pm.role_folders(master.proj)[2].index), 0)
+  t.truthy(math.abs(reaper.GetMediaItemInfo_Value(master_item, "D_POSITION") - 0.4) < 0.001, "the offline member's timing must reach the master")
+  t.eq(deliveries.status(fs, entry.pub_dir, sent.id), "accepted")
+
   -- 6. a truncated copy (a stick removed too early) is refused, not accepted
   local broken = fx.root .. "/broken/" .. sent.id
   assert(copytree.copy(fs, sent.dir, broken))
