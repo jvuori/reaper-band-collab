@@ -109,6 +109,10 @@ end
 -- Project-level markers: what kind of managed project this is, and for which band.
 M.KEY_KIND = "kind"          -- "template" or "song"
 M.KEY_BAND = "band_name"
+M.KEY_SONG = "song_id"       -- workspace projects: which song, whose workspace, which revision it is based on
+M.KEY_MEMBER = "member"
+M.KEY_BASE = "base_revision"
+M.KEY_STEM = "bandcollab_stem" -- track marker: this folder is a stem of someone else's work ("1"), or the reference mix ("reference")
 
 function M.set_project_marker(proj, key, value) reaper.SetProjExtState(proj, M.SECTION, key, value) end
 

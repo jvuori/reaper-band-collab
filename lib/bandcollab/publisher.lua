@@ -4,6 +4,7 @@
 -- information, and the folder's own tracks and media so a member can start a workspace from the
 -- publication alone. The manifest and completion marker are written last.
 local pm = require("bandcollab.projectmodel")
+local ownexport = require("bandcollab.ownexport")
 local songfile = require("bandcollab.songfile")
 local cycles = require("bandcollab.cycles")
 local revisions = require("bandcollab.revisions")
@@ -105,35 +106,6 @@ local function render(fs, proj, dir, pattern, settings, sample_rate)
   return file
 end
 
--- export_own(fs, proj, folder, dir, project_dir, yield) -> number of media files | nil, err
--- Writes dir/tracks.chunk (the folder's track state) and dir/media/* with the files it uses, under
--- safe names, with the chunk's FILE lines pointing at them.
-local function export_own(fs, proj, folder, dir, project_dir, yield)
-  local chunks = {}
-  for i = folder.index, folder.last do
-    local _, chunk = reaper.GetTrackStateChunk(reaper.GetTrack(proj, i - 1), "", false)
-    chunks[#chunks + 1] = chunk
-  end
-  local text = table.concat(chunks, "\n")
-  local map, used, count = {}, {}, 0
-  for _, ref in ipairs(rpp.media_refs(text)) do
-    local source = inspect.resolve(project_dir, ref)
-    local base, ext = path.basename(source):match("^(.*)(%.[^.]*)$")
-    if not base then base, ext = path.basename(source), "" end
-    local name = slug.unique(slug.slug(base), used) .. ext:lower()
-    used[name:gsub("%.[^.]*$", "")] = true
-    used[slug.slug(base)] = true
-    if not fs.mkdirs(dir .. "/media") then return nil, "cannot create " .. dir .. "/media" end
-    local ok, err = copytree.copy_file(fs, source, dir .. "/media/" .. name, yield)
-    if not ok then return nil, "cannot copy " .. ref .. ": " .. tostring(err) end
-    map[ref] = "media/" .. name
-    count = count + 1
-  end
-  local written, werr = fs.write_all(dir .. "/tracks.chunk", rpp.rewrite_media(text, map))
-  if not written then return nil, werr end
-  return count
-end
-
 -- publish(fs, band, band_folder, proj, S [, opts]) -> result | nil, code, detail
 --   opts.note = { summary =, body = }   opts.tasks = { {who =, text =}, ... }
 --   opts.step(text)   called between the phases, for progress display
@@ -187,7 +159,7 @@ function M.publish(fs, band, band_folder, proj, S, opts)
       stem = "stems/" .. f.role .. ".wav", own = "own/" .. f.role,
     }
     step("own: " .. f.role)
-    local n, eerr = export_own(fs, proj, f, rev_dir .. "/own/" .. f.role, project_dir, opts.yield)
+    local n, eerr = ownexport.export(fs, proj, f, rev_dir .. "/own/" .. f.role, project_dir, opts.yield)
     if not n then failure_code, failure_detail = "publish_cannot_write", eerr; break end
   end
 

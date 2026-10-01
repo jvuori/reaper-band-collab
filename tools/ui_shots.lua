@@ -26,9 +26,15 @@ local messages = require("bandcollab.messages")
 local wizard_view = require("wizard_view")
 local receive_view = require("receive_view")
 local publish_view = require("publish_view")
+local sync_view = require("sync_view")
+local picker_view = require("picker_view")
+local sync_session = require("bandcollab.sync_session")
+local workspace_picker = require("bandcollab.workspace_picker")
+local wm = require("bandcollab.workspace_model")
 local publish_session = require("bandcollab.publish_session")
 local songfile = require("bandcollab.songfile")
 local manifest = require("bandcollab.manifest")
+local json = require("bandcollab.json")
 local receive_session = require("bandcollab.receive_session")
 package.path = root .. "/tests/?.lua;" .. package.path
 local memfs = require("memfs")
@@ -189,6 +195,83 @@ end)
 scenario("publish_unsaved_fi", "fi", 680, 160, function(_)
   local sess, s = publish_world("fi", { dirty = true })
   return function(ctx) return publish_view.draw(ctx, sess, s) end, s:t("ui.publish.title")
+end)
+
+-- Synkronoi panel: fake operations with a canned state
+local function sync_world(lang, kind, opts)
+  opts = opts or {}
+  local s = S(lang)
+  local env = { undo_from = opts.undo_from }
+  env.status = function()
+    return { sync = { kind = kind, master_newer = kind == "down" or kind == "both", own_changed = kind == "up" or kind == "both" },
+      arriving = opts.arriving or false, closed = opts.closed or false, proposal = opts.proposal, latest = 4, base = 3 }
+  end
+  env.can_undo = function() return env.undo_from end
+  env.preflight = function() return opts.pre or { problems = {}, blocking = false, warnings = {} } end
+  env.fetch = function() return nil end
+  local ws = { proj = "P", dir = "/d", file = "/d/work/x.rpp", state = { member = "eero", base_revision = 3, song = { title = lang == "fi" and "Yö kuka minä" or "Night song" } } }
+  local sess = sync_session.new(memfs.new(), receive_band(lang), "/band", s, ws, env)
+  sess:refresh()
+  return sess, s
+end
+local function sync_scenario(name, lang, kind, height, opts, prepare)
+  scenario(name, lang, 640, height, function(_)
+    local sess, s = sync_world(lang, kind, opts)
+    if prepare then prepare(sess) end
+    return function(ctx) return sync_view.draw(ctx, sess) end, s:t("ui.sync.title")
+  end)
+end
+sync_scenario("sync_none_fi", "fi", "none", 130, nil)
+sync_scenario("sync_down_fi", "fi", "down", 190, nil)
+sync_scenario("sync_up_fi", "fi", "up", 330, { proposal = { id = "d1", sent = "2026-09-29 21:40", status = "pending" } }, function(sess)
+  sess.note.summary = "Tiukennettu säkeistö 2"
+  sess.note.body = "Uudet täytteet kohdassa 1:32."
+end)
+sync_scenario("sync_both_en", "en", "both", 470, nil)
+sync_scenario("sync_problems_fi", "fi", "up", 480, {
+  pre = { blocking = true, warnings = { "send_empty" }, problems = {
+    { code = "send_orphans", severity = "blocking", detail = 2, fix = "move_orphans" },
+    { code = "send_empty", severity = "warning" },
+  } },
+}, function(sess) sess:check() end)
+sync_scenario("sync_fetched_fi", "fi", "up", 380, { undo_from = 3 }, function(sess)
+  sess.result = { ok = true, text = sess.S:t("ui.sync.fetched", { n = 4 }),
+    warning = sess.S:t("ui.sync.structure_warning", { reasons = "pituus, osiot" }) }
+end)
+
+-- workspace picker
+local function picker_world(lang, with_songs)
+  local s = S(lang)
+  local fs = memfs.new()
+  local b = receive_band(lang)
+  b.members = { { id = "aino", name = "Aino", roles = { "bass" } }, { id = "eero", name = "Eero", roles = { "drums", "keys" } } }
+  b.roles = { { id = "bass", label = "Basso" }, { id = "drums", label = "Rummut" }, { id = "keys", label = "Koskettimet" } }
+  if with_songs then
+    local function pub(dir, title)
+      local d = dir .. "/r1"
+      fs.files[d .. "/stems/bass.wav"] = ("s"):rep(300)
+      fs.files[d .. "/publication.json"] = json.encode({ schema = 1, song = { id = "s0123456789abcdef", title = title } })
+      manifest.write(fs, d, manifest.build(fs, d, { created = "T" }))
+    end
+    pub("/band/julkaisut/harjoitukset/2026-09-29/uusi", lang == "fi" and "Uusi biisi" or "New song")
+    pub("/band/julkaisut/harjoitukset/2026-09-22/vanha", lang == "fi" and "Vanha biisi" or "Old song")
+    pub("/band/julkaisut/harjoitukset/2026-09-15/suljettu", lang == "fi" and "Suljettu biisi" or "Closed song")
+    fs.files["/band/julkaisut/harjoitukset/2026-09-29/tulossa/r1/stems/bass.wav"] = "half"
+    wm.write_state(fs, "/band/ehdotukset/eero/harjoitukset/2026-09-22/vanha", { song = { id = "s1" }, member = "eero", base_revision = 1, own_fingerprint = "x" })
+    local cyc = require("bandcollab.cycles")
+    cyc.ensure(fs, b, "/band", b.libraries[1], "2026-09-15", "T"); cyc.close(fs, b, "/band", b.libraries[1], "2026-09-15", "T2")
+  end
+  local sess = workspace_picker.new(fs, b, "/band", s, "eero", { create = function() end, open = function() end })
+  sess:refresh()
+  return sess, s
+end
+scenario("picker_fi", "fi", 620, 420, function(_)
+  local sess, s = picker_world("fi", true)
+  return function(ctx) return picker_view.draw(ctx, sess) end, s:t("ui.picker.title")
+end)
+scenario("picker_empty_en", "en", 620, 220, function(_)
+  local sess, s = picker_world("en", false)
+  return function(ctx) return picker_view.draw(ctx, sess) end, s:t("ui.picker.title")
 end)
 
 local errors = {}

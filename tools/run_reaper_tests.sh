@@ -30,12 +30,14 @@ while [ $(( $(date +%s) - start )) -lt "$MAX" ]; do
   pids="$(mine)"
   [ -z "$pids" ] && break                          # REAPER has exited
   now=$(date +%s)
+  declare -A present=()
   for pid in $pids; do
     while IFS=$'\t' read -r id title; do
       [ -z "$title" ] && continue
       blocking=0
       [[ "$title" =~ ^(REAPER\ Query|Error|Save|Warning|Missing|Confirm) ]] && blocking=1
       key="$pid|$title"
+      present[$key]=1
       [ -z "${first_seen[$key]:-}" ] && first_seen[$key]=$now
       if [ "$blocking" = 1 ] || [ $(( now - first_seen[$key] )) -gt "$TOLERATE" ]; then
         import -window "$id" "$OUT.dialog.png" 2>/dev/null
@@ -45,6 +47,8 @@ while [ $(( $(date +%s) - start )) -lt "$MAX" ]; do
       fi
     done < <(extras "$pid")
   done
+  # a window that has closed starts a fresh clock the next time it appears (each render shows one)
+  for key in "${!first_seen[@]}"; do [ -z "${present[$key]:-}" ] && unset "first_seen[$key]"; done
   sleep 0.5
 done
 if [ ! -f "$OUT" ]; then

@@ -50,16 +50,16 @@
 
 ## 6. Member workspace (spec: member-workspace)
 
-- [ ] 6.1 Implement listing songs with a valid publication and hiding those without, and verify the "not published yet" message
+- [x] 6.1 Implement listing songs with a valid publication and hiding those without, and verify the "not published yet" message
 - [ ] 6.2 Implement "Luo oma työtila" building the project with editable own folder(s) and locked collapsed stems, and verify locked items cannot be moved on Windows and Linux
-- [ ] 6.3 Configure the workspace recording location and verify a new take lands inside the workspace
-- [ ] 6.4 Implement state detection (master newer, own changes, both, none) and verify each of the four Synkronoi states in the UI
-- [ ] 6.5 Implement "Hae pääversio" with own-folder backup, replacing only others' stems and timing, and verify own tracks remain unchanged
-- [ ] 6.6 Implement the structural-change warning on fetch and verify with a lengthened chorus
-- [ ] 6.7 Implement "Palauta edellinen tila" and verify the pre-fetch state is restored
-- [ ] 6.8 Implement the send preflight (media consolidation, timing vs. base, empty folder, orphan tracks) with plain-language fixes and verify each case
-- [ ] 6.9 Implement frozen, timestamped deliveries that supersede without removing older ones and verify two sends keep both
-- [ ] 6.10 Implement the note field and proposal status line (sent time, pending/accepted) and verify the panel shows both after sending
+- [x] 6.3 Configure the workspace recording location and verify a new take lands inside the workspace
+- [x] 6.4 Implement state detection (master newer, own changes, both, none) and verify each of the four Synkronoi states in the UI
+- [x] 6.5 Implement "Hae pääversio" with own-folder backup, replacing only others' stems and timing, and verify own tracks remain unchanged
+- [x] 6.6 Implement the structural-change warning on fetch and verify with a lengthened chorus
+- [x] 6.7 Implement "Palauta edellinen tila" and verify the pre-fetch state is restored
+- [x] 6.8 Implement the send preflight (media consolidation, timing vs. base, empty folder, orphan tracks) with plain-language fixes and verify each case
+- [x] 6.9 Implement frozen, timestamped deliveries that supersede without removing older ones and verify two sends keep both
+- [x] 6.10 Implement the note field and proposal status line (sent time, pending/accepted) and verify the panel shows both after sending
 - [ ] 6.11 Verify the offline route end to end: send a proposal into a local band folder, copy it on removable media, and import it unchanged
 
 ## 7. Proposal import (spec: proposal-import)

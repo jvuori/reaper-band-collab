@@ -16,30 +16,30 @@ M.TEMPLATE_PATH = "template/song-template.rpp" -- relative to the band folder
 
 local EMPTY_PROJECT = '<REAPER_PROJECT 0.1 "7.0" 0\n>\n'
 
-local function new_tab()
+function M.new_tab()
   reaper.Main_OnCommand(40859, 0) -- File: New project tab
   return (reaper.EnumProjects(-1))
 end
 
-local function close_tab(proj)
+function M.close_tab(proj)
   reaper.SelectProjectInstance(proj)
   reaper.Main_OnCommand(40860, 0) -- File: Close current project tab
 end
 
--- open_bound(file) -> project tab that was opened from `file`
-local function open_bound(file)
-  new_tab()
+-- M.open_bound(file) -> project tab that was opened from `file`
+function M.open_bound(file)
+  M.new_tab()
   reaper.Main_openProject("noprompt:" .. file)
   return (reaper.EnumProjects(-1))
 end
 
--- save_bound(proj): saves a project that was opened from its own file (never asks for a name)
-local function save_bound(proj)
+-- M.save_bound(proj): saves a project that was opened from its own file (never asks for a name)
+function M.save_bound(proj)
   reaper.SelectProjectInstance(proj)
   reaper.Main_OnCommand(40026, 0) -- File: Save project
 end
 
-local function restore_selection(original)
+function M.restore_selection(original)
   if original and reaper.ValidatePtr(original, "ReaProject*") then reaper.SelectProjectInstance(original) end
 end
 
@@ -49,14 +49,14 @@ function M.create_template(fs, band, counts, file)
   local original = (reaper.EnumProjects(-1))
   if not fs.mkdirs(path.dirname(file)) then return nil, "cannot create " .. path.dirname(file) end
   if not fs.write_all(file, EMPTY_PROJECT) then return nil, "cannot write " .. file end
-  local proj = open_bound(file)
+  local proj = M.open_bound(file)
   pm.apply_plan(proj, template.plan(band, counts))
   pm.set_recording_path(proj)
   pm.set_project_marker(proj, pm.KEY_KIND, "template")
   pm.set_project_marker(proj, pm.KEY_BAND, band.name)
-  save_bound(proj)
-  close_tab(proj)
-  restore_selection(original)
+  M.save_bound(proj)
+  M.close_tab(proj)
+  M.restore_selection(original)
   return true
 end
 
@@ -77,13 +77,13 @@ function M.create_song(fs, template_file, dest_dir, title, opts)
   if not fs.write_all(file, text) then return nil, "cannot write " .. file end
 
   local original = (reaper.EnumProjects(-1))
-  local proj = open_bound(file)
+  local proj = M.open_bound(file)
   pm.set_project_marker(proj, pm.KEY_KIND, "song")
   reaper.GetSetProjectInfo_String(proj, "PROJECT_TITLE", title, true)
-  save_bound(proj)
+  M.save_bound(proj)
   if not opts.keep_open then
-    close_tab(proj)
-    restore_selection(original)
+    M.close_tab(proj)
+    M.restore_selection(original)
   end
   if not fs.exists(file) then return nil, "song was not saved: " .. file end
   return file, name
