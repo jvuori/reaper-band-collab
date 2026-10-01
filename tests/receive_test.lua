@@ -268,3 +268,16 @@ t.test("song ids are unique even when the random source repeats itself", functio
   t.falsy(taken[id])
   t.truthy(ids.valid(id))
 end)
+
+t.test("the master gets a distinctive file name when asked, and everything else keeps working", function()
+  local fs, ctx = world()
+  stage(fs, "/stage/a", "eka")
+  local c = receive.candidates(ctx, "/stage")[1]
+  local e = receive.import(ctx, c, { library = "harjoitukset", cycle = "2026-09-29", now = NOW, master_prefix = "PAAVERSIO" })
+  t.truthy(e)
+  local dest = "/band/" .. e.path
+  t.truthy(fs.exists(dest .. "/PAAVERSIO_eka.rpp"), "the master must carry a name that says what it is")
+  t.falsy(fs.exists(dest .. "/eka.rpp"))
+  t.truthy(fs.exists(dest .. "/media/eka.wav")); t.eq(songfile.read(fs, dest).id, e.id)
+  t.truthy(manifest.verify(fs, dest), "the manifest must describe the renamed file, so the folder verifies")
+end)

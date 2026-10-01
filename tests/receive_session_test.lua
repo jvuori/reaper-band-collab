@@ -57,7 +57,7 @@ t.test("receiving runs in slices and reports each song", function()
   t.falsy(s:running())
   t.eq(#s.results, 2)
   for _, r in ipairs(s.results) do t.truthy(r.ok); t.truthy(r.text:find("Vastaanotettu")) end
-  t.truthy(fs.exists("/band/tuottaja/harjoitukset/2026-09-29/eka/eka.rpp"))
+  t.truthy(fs.exists("/band/tuottaja/harjoitukset/2026-09-29/eka/PAAVERSIO_eka.rpp"), "the master carries a name that says what it is")
   s:refresh("/stage")
   t.eq(s.rows[1].status.kind, "already"); t.falsy(s.rows[1].selected)
   t.eq(#s.results, 2, "the confirmations must stay visible after the list is refreshed")

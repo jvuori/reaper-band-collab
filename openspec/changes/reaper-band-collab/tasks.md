@@ -83,15 +83,15 @@
 
 ## 9. Project guardian (spec: project-guardian)
 
-- [ ] 9.1 Implement recognition of managed projects (manifest + role) and verify no message appears for an unrelated project
-- [ ] 9.2 Implement the master-opened warning with close action and event logging, and verify manually as a member identity
-- [ ] 9.3 Implement warnings for another member's workspace, closed cycle, misplaced or copied workspace, and verify each case
-- [ ] 9.4 Implement the soft outdated-workspace notice with Synkronoi shortcut and verify it is non-blocking
-- [ ] 9.5 Implement warn-once-per-open behavior and verify a dismissed warning does not reappear until reopen
-- [ ] 9.6 Write the master's passive marker and distinctive file name and verify they are visible with the extension uninstalled
+- [x] 9.1 Implement recognition of managed projects (manifest + role) and verify no message appears for an unrelated project
+- [x] 9.2 Implement the master-opened warning with close action and event logging, and verify manually as a member identity
+- [x] 9.3 Implement warnings for another member's workspace, closed cycle, misplaced or copied workspace, and verify each case
+- [x] 9.4 Implement the soft outdated-workspace notice with Synkronoi shortcut and verify it is non-blocking
+- [x] 9.5 Implement warn-once-per-open behavior and verify a dismissed warning does not reappear until reopen
+- [x] 9.6 Write the master's passive marker and distinctive file name and verify they are visible with the extension uninstalled
 - [ ] 9.7 Install the guardian startup hook per the spike (with panel-open fallback) and verify it runs after a REAPER restart on both OSes
-- [ ] 9.8 Implement "Tarkista kansiot" (incomplete packs, unregistered projects, duplicate IDs, wrong-area files, proposals in closed cycles, unreferenced media, bad names) as report-only with confirmed fixes, and verify each finding on a deliberately broken folder
-- [ ] 9.9 Verify all guardian and lock wording avoids implying editing is impossible
+- [x] 9.8 Implement "Tarkista kansiot" (incomplete packs, unregistered projects, duplicate IDs, wrong-area files, proposals in closed cycles, unreferenced media, bad names) as report-only with confirmed fixes, and verify each finding on a deliberately broken folder
+- [x] 9.9 Verify all guardian and lock wording avoids implying editing is impossible
 
 ## 10. Localization (spec: localization)
 

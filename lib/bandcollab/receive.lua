@@ -51,6 +51,7 @@ end
 --   opts.library      library id (default: the first library of the band)
 --   opts.cycle        YYYY-MM-DD for dated libraries (default: today)
 --   opts.title        display title (default: the candidate's title)
+--   opts.master_prefix  file name prefix for the master project (e.g. "MASTER")
 --   opts.copy         true when the producer confirmed that a "copy" is a copy (a fresh id is assigned)
 --   opts.yield, opts.now, opts.rng
 -- Codes: incomplete, already_registered, already_received, copy_undecided, bad_date, unknown_library,
@@ -98,6 +99,12 @@ function M.import(ctx, cand, opts)
     yield = opts.yield,
   })
   if not copied then return nil, "cannot_copy", cerr end
+
+  -- a distinctive file name for the master (shows in REAPER's title bar and file dialogs even
+  -- without the extension): <prefix>_<slug>.rpp
+  if opts.master_prefix and opts.master_prefix ~= "" then
+    fs.rename(dest .. "/" .. path.basename(cand.rpp), dest .. "/" .. opts.master_prefix .. "_" .. name .. ".rpp")
+  end
 
   local created = opts.now or os.date("!%Y-%m-%dT%H:%M:%SZ")
   local rel = path.relative(ctx.band_folder, dest)

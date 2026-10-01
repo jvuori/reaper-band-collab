@@ -24,6 +24,21 @@ Provide a ReaPack-installed script action, **"Enable band guardian"**, run once 
 
 The fallback defined in design D12 stays: opening the panel runs the same check once.
 
+## Verified end to end (Linux)
+
+`tools/guardian_e2e.sh` installs the start-up block into a throwaway profile, restarts REAPER and checks, without
+touching anything by hand, that (1) the guardian starts by itself (its heartbeat in `ExtState` appears within a fraction
+of a second, no start-up error), (2) opening the master as a member makes the warning window appear, and (3) the event
+is logged. It always removes the block afterwards. Lessons it taught, now built in:
+
+- **ReaImGui discards a context that is not used for a while.** A guardian that creates its context at start-up and only
+  draws when something happens crashed with `ImGui_Begin: expected a valid ImGui_Context`. The context is now made when
+  needed and made again if it was discarded (`ImGui_ValidatePtr`).
+- **An error inside a background loop must not reach a band member as a "ReaScript Error" window.** The loop is wrapped
+  in `xpcall`; the error text goes to `ExtState bandcollab/guardian_error`, the loop carries on, and after five failures
+  it stops quietly.
+- **Auto-resizing windows with wrapped text shrink to a sliver**; the window gets a minimum width.
+
 ## Still open
 
 - Repeat the probe on Windows, including with a pre-existing `__startup.lua`.

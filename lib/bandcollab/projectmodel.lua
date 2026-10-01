@@ -8,6 +8,7 @@ local M = {}
 M.KEY_ROLE = "bandcollab_role"   -- role id, on the role's folder track
 M.KEY_OWNER = "bandcollab_owner" -- member id at the time the folder was created
 M.SECTION = "bandcollab"         -- project-level extended state section
+M.MASTER_MARKER_NUMBER = 9999 -- reserved: the visible "this is the master" banner region
 M.MEDIA_DIR = "media"            -- recording path, relative to the project
 
 function M.set_marker(track, key, value)

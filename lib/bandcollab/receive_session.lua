@@ -12,14 +12,14 @@ Session.__index = Session
 
 -- new(fs, band, band_folder, S, member) -> session | nil, code
 -- Only the producer receives rehearsals.
-function M.new(fs, band, band_folder, S, member)
+function M.new(fs, band, band_folder, S, member, env)
   if member ~= band.producer then return nil, "not_producer" end
   local ctx, code = receive.context(fs, band, band_folder)
   if not ctx then return nil, code end
   local libs = bandfile.libraries(band)
   return setmetatable({
     fs = fs, band = band, ctx = ctx, S = S, rows = {}, results = {},
-    library = libs[1].id, cycle = os.date("%Y-%m-%d"), job = nil, progress = "",
+    library = libs[1].id, cycle = os.date("%Y-%m-%d"), job = nil, progress = "", env = env or {},
   }, Session)
 end
 
@@ -82,12 +82,17 @@ function Session:start()
     for _, row in ipairs(rows) do
       local entry, code, detail = receive.import(self.ctx, row.cand, {
         library = self.library, cycle = self.cycle, title = row.title, copy = row.decision == "copy",
+        master_prefix = self.S:t("master.file_prefix"),
         yield = function(_, file)
           self.progress = self.S:t("ui.receive.progress", { file = tostring(file):match("[^/\\]*$") })
           coroutine.yield()
         end,
       })
       if entry then
+        if self.env.mark_master then -- the visible banner inside the master project (needs REAPER)
+          local file = self.ctx.band_folder .. "/" .. entry.path .. "/" .. self.S:t("master.file_prefix") .. "_" .. entry.slug .. ".rpp"
+          pcall(self.env.mark_master, self.fs, file, self.S:t("master.marker"))
+        end
         self.results[#self.results + 1] = { ok = true, title = row.title, text = self.S:t("ui.receive.received", { title = row.title }), entry = entry }
       else
         local detail_text = type(detail) == "table" and (detail[1] and detail[1].path) or detail

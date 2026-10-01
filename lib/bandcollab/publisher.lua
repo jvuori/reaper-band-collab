@@ -77,9 +77,11 @@ function M.capture_timing(proj)
   local markers = {}
   local i = 0
   while true do
-    local ret, is_region, pos, region_end, name = reaper.EnumProjectMarkers2(proj, i)
+    local ret, is_region, pos, region_end, name, number = reaper.EnumProjectMarkers2(proj, i)
     if not ret or ret == 0 then break end
-    markers[#markers + 1] = { pos = pos, rgnend = is_region and region_end or nil, region = is_region or nil, name = name }
+    if number ~= pm.MASTER_MARKER_NUMBER then -- the "this is the master" banner is not a section of the song
+      markers[#markers + 1] = { pos = pos, rgnend = is_region and region_end or nil, region = is_region or nil, name = name }
+    end
     i = i + 1
   end
   return timing.capture({

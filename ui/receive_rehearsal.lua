@@ -25,7 +25,8 @@ if not band then
 end
 S.lang = band.language
 
-local sess, code = receive_session.new(fs, band, settings:band_folder(), S, member_or_code)
+local master_marker = require("bandcollab.master_marker")
+local sess, code = receive_session.new(fs, band, settings:band_folder(), S, member_or_code, { mark_master = master_marker.ensure })
 if not sess then
   reaper.ShowMessageBox(messages.get(S, code).text, "Band Collab", 0)
   return

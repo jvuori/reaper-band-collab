@@ -29,6 +29,9 @@ local publish_view = require("publish_view")
 local sync_view = require("sync_view")
 local picker_view = require("picker_view")
 local import_view = require("import_view")
+local guardian_view = require("guardian_view")
+local folders_view = require("folders_view")
+local foldercheck = require("bandcollab.foldercheck")
 local import_session = require("bandcollab.import_session")
 local sync_session = require("bandcollab.sync_session")
 local workspace_picker = require("bandcollab.workspace_picker")
@@ -329,6 +332,36 @@ scenario("import_done_fi", "fi", 680, 330, function(_)
   local sess, s = import_world("fi", { undo_id = "d1", empty = true })
   sess.result = { ok = true, text = s:t("ui.import.imported") }
   return function(ctx) return import_view.draw(ctx, sess) end, s:t("ui.import.title")
+end)
+
+-- guardian alerts
+local function guardian_scenario(name, lang, height, alert)
+  scenario(name, lang, 560, height, function(_)
+    local s = S(lang)
+    return function(ctx) return guardian_view.draw(ctx, alert, s) end, s:t("guardian.title")
+  end)
+end
+guardian_scenario("guardian_master_fi", "fi", 260, { file = "/band/tuottaja/harjoitukset/2026-09-29/biisi/PAAVERSIO_biisi.rpp", warnings = { { code = "master", severity = "strong" } } })
+guardian_scenario("guardian_other_en", "en", 260, { file = "/band/proposals/eero/rehearsals/2026-09-29/song/work/song.rpp", warnings = { { code = "other_workspace", severity = "strong", vars = { owner = "Eero", you = "Pia" } } } })
+guardian_scenario("guardian_outdated_fi", "fi", 260, { file = "/band/ehdotukset/eero/harjoitukset/2026-09-29/biisi/work/biisi.rpp", warnings = { { code = "outdated", severity = "soft", vars = { latest = 8, base = 5 } } } })
+guardian_scenario("guardian_misplaced_fi", "fi", 300, { file = "/home/eero/Desktop/work/biisi.rpp", warnings = { { code = "misplaced", severity = "warning", vars = { where = "/band/ehdotukset/eero/harjoitukset/2026-09-29/biisi/work/biisi.rpp" } }, { code = "closed_cycle", severity = "warning" } } })
+
+-- folder check
+scenario("folders_clean_fi", "fi", 640, 150, function(s0)
+  local s = S("fi")
+  local st = { ran = true, problems = {}, tidy = {} }
+  return function(ctx) return folders_view.draw(ctx, st, s) end, s:t("check.title")
+end)
+scenario("folders_problems_en", "en", 700, 420, function(s0)
+  local s = S("en")
+  local st = { ran = true, tidy = {
+      { code = "stray_file", path = "producer/rehearsals/2026-09-29/song/media/peaks/bass.wav.reapeaks", fix = "delete", severity = "tidy" },
+      { code = "stray_file", path = "producer/rehearsals/2026-09-29/song/Backups/song-2026-10-02.rpp-bak", fix = "delete", severity = "tidy" } },
+    problems = {
+      { code = "incomplete_pack", path = "publications/rehearsals/2026-09-29/song/r2" },
+      { code = "unregistered_project", path = "producer/rehearsals/2026-09-29/outo/outo.rpp" },
+      { code = "bad_name", path = "producer/rehearsals/New folder", detail = "not a date (year-month-day)" } } }
+  return function(ctx) return folders_view.draw(ctx, st, s) end, s:t("check.title")
 end)
 
 local errors = {}
